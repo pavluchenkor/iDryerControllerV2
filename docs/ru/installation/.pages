@@ -1,0 +1,4 @@
+title: Установка и конфигурация
+nav:
+  - Прошивка контроллера: firmware-install.md
+  - Конфигурация портов: port-config.md

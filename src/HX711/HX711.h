@@ -1,0 +1,101 @@
+#ifndef HX711_h
+#define HX711_h
+#include "hardware/watchdog.h"
+#include "leds/leds.h"
+#include "menu/menu_eeprom.h"
+#include "menu/menu_eeprom_io.h"
+#include "menu/menu_state.h"
+#include <Arduino.h>
+#include <EEPROM.h>
+#define MAX_SENSORS 4
+#define RATE 1
+
+
+#define RATE_DELAY 500
+#define PROBE_QUANTITY 50
+
+class HX711 {
+private:
+  byte CLOCK_PIN;
+  byte OUT_PIN;
+  byte GAIN;
+  bool pinsConfigured;
+  float ratio;
+
+public:
+  int32_t zero_weight;
+  int32_t offset;
+  uint16_t tare;
+  uint16_t mass;
+  uint16_t mass_filter[5];
+
+  HX711() {};
+  HX711(byte output_pin, byte clock_pin);
+  virtual ~HX711();
+  bool readyToSend();
+  void setGain(byte gain = 128);
+  int32_t read();
+  int16_t read_mass();
+  void zeroSet(uint8_t avg_size);
+  int32_t zeroGet();
+  void tareSet(uint8_t avg_size);
+  float tareGet();
+  void offsetFirstSet(uint8_t avg_size);
+  void offsetSet(int32_t offset_settings);
+  int32_t offsetGet();
+  uint16_t median(uint16_t newValue);
+  void setupGain();
+};
+
+class HX711Multi {
+public:
+  HX711Multi(uint8_t numSensors, uint8_t dtPin, uint8_t sckPin, uint8_t aPin, uint8_t bPin);
+  void begin(byte gain);
+  int32_t getZeroWeight(uint8_t numSensor);
+  void zeroSetupMulti(uint8_t sensorNum);
+  void offsetSetupMulti(uint8_t sensorNum);
+  int32_t readMulti(uint8_t sensorIndex);
+  // int16_t readMassMulti(uint8_t scales_count);
+  bool readMassMulti(uint8_t scales_count);
+  void setNumSensors(uint8_t numSensors);
+  void setGain(byte gain);
+  void setupGainMulti(uint8_t sensorIndex);
+  bool readyToSend(uint8_t sensorIndex);
+  bool multiplexerPinSet(uint8_t sensorNum);
+  float getMassMulti(uint8_t sensorNum);       // нетто: без тары держателя
+  float getMassBruttoMulti(uint8_t sensorNum); // брутто: с тарой, для детекта снятия
+
+  // true если чип физически отвечает (первый raw не равен 0x800000/0x7FFFFF)
+  bool isReady() const { return _scalesAvailable; }
+  void offsetFirstSetMulti(uint8_t avg_size, uint8_t sensorNum);
+  void tempOffsetSetMulti(uint8_t sensorNum, uint8_t temp, uint8_t avg_size);
+  void zeroSetMulti(uint8_t avg_size, uint8_t sensorNum);
+  uint8_t sensorNum;
+  uint8_t current_temperature;
+
+private:
+  enum class ReadStage : uint8_t {
+    SelectMux,
+    WaitMuxSettle,
+    WaitDiscardReady,
+    WaitSampleReady,
+  };
+
+  uint8_t _numSensors;
+  uint8_t _prevNum;
+  ReadStage _readStage = ReadStage::SelectMux;
+  uint8_t _multiplexerPinSetFlag;
+  bool _scalesAvailable = false; // true после первого raw != 0x800000/0x7FFFFF
+  unsigned long _lastTime = 0;
+  unsigned long _lastTimeReadMassMulti = 0;
+  uint8_t _dtPin;
+  uint8_t _sckPin;
+  uint8_t _aPin;
+  uint8_t _bPin;
+  uint8_t GAIN;
+  bool pinsConfigured;
+
+  float mass_filter[MAX_SENSORS][5];
+};
+
+#endif /* HX711_h */

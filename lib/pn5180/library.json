@@ -1,0 +1,7 @@
+{
+  "name": "pn5180",
+  "version": "0.1.0",
+  "build": {
+    "includeDir": "src"
+  }
+}

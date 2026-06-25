@@ -1,0 +1,5 @@
+title: Протокол и API
+nav:
+  - Обзор UART/TLV: overview.md
+  - API микроконтроллера: device-api.md
+  - Адаптер UART↔Web: web-adapter.md

@@ -1,0 +1,1744 @@
+# ===========================================
+# ЛЕГЕНДА
+# -------------------------------------------
+# Узлы:
+# - id:            строковый уникальный идентификатор (латиница/цифры/подчёрки), станет MENU_<ID>
+# - type:          submenu | value | toggle | action
+# - title:         {ru: "...", en: "...", ...}
+# - unit:          {ru: "...", en: "..."}       - опционально для value/toggle
+# - vtype:         float | uint16 | uint8 | int32 | bool
+# - min/max/step:  числовые границы/шаг
+# - bind:          имя переменной в прошивке
+# - persist:       true/false
+# - default:       значение по умолчанию
+# - on_change:     имя функции (void fn(void* ptr))
+# - on_invoke:     имя функции (void fn(void))
+# - apply:         "live" - применять сразу
+# - children:      массив вложенных узлов
+# - scope:         глобальная или локальная для каждого контроллера
+# ===========================================
+
+# ===========================================
+# ЛЕГЕНДА
+# + scope: global | per_controller
+# ===========================================
+# ===========================================
+# ГЕНЕРАЦИЯ
+# source .venv/bin/activate
+# python src/menu/generator/gen_menu_v2.py src/menu/menu_v2.yaml --out src/menu
+# ===========================================
+
+- id: root
+  type: submenu
+  title: { ru: "МЕНЮ", en: "MENU" }
+  children:
+    # --- КОНТРОЛЛЕР (ГЛОБАЛЬНО) ---
+    - id: controller_choice
+      type: value
+      title: { ru: "КОНТРОЛЛЕР", en: "CONTROLLER" }
+      vtype: uint8
+      min: 0
+      max: 2
+      step: 1
+      bind: number_controller
+      persist: true
+      scope: global
+      default: 0
+      on_change: set_active_controller
+
+    # --- СУШКА (ПО КОНТРОЛЛЕРАМ) ---
+    - id: drying
+      type: submenu
+      title: { ru: "СУШКА", en: "DRYING" }
+      scope: per_controller
+      children:
+        - id: dry_temp
+          type: value
+          title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+          unit: { ru: "°C", en: "°C" }
+          vtype: float
+          min: 30
+          max: 110
+          step: 1
+          bind: dry_temp
+          persist: true
+          default: 60.0
+
+        - id: dry_time
+          type: value
+          title: { ru: "ВРЕМЯ", en: "TIME" }
+          unit: { ru: "мин", en: "min" }
+          vtype: uint16
+          min: 0
+          max: 600
+          step: 1
+          bind: dry_time
+          persist: true
+          default: 240
+
+        - id: dry_start
+          type: action
+          title: { ru: "СТАРТ", en: "START" }
+          on_invoke: start_drying
+
+    # --- ХРАНЕНИЕ (ПО КОНТРОЛЛЕРАМ) ---
+    - id: storage
+      type: submenu
+      title: { ru: "ХРАНЕНИЕ", en: "STORAGE" }
+      scope: per_controller
+      children:
+        - id: storage_temp
+          type: value
+          title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+          unit: { ru: "°C", en: "°C" }
+          vtype: uint8
+          min: 35
+          max: 90
+          step: 1
+          bind: storage_temp
+          persist: true
+          default: 45.0
+
+        - id: storage_hum
+          type: value
+          title: { ru: "ВЛАЖНОСТЬ", en: "HUMIDITY" }
+          unit: { ru: "%RH", en: "%RH" }
+          vtype: uint8
+          min: 5
+          max: 30
+          step: 1
+          bind: storage_hum
+          persist: true
+          default: 12
+
+        - id: storage_hum_priority
+          type: toggle
+          title: { ru: "ПО ВЛАЖНОСТИ", en: "BY HUMIDITY" }
+          vtype: bool
+          bind: storage_hum_priority
+          persist: true
+          default: true
+
+        - id: storage_start
+          type: action
+          title: { ru: "СТАРТ", en: "START" }
+          on_invoke: start_storage
+
+    # --- ПРОФИЛЬ (ПО КОНТРОЛЛЕРАМ) ---
+    - id: profile
+      type: submenu
+      title: { ru: "ПРОФИЛЬ", en: "PROFILE" }
+      scope: per_controller
+      children:
+        - id: profile_start
+          type: submenu
+          title: { ru: "СТАРТ ПРОФИЛЯ", en: "PROFILE START" }
+          children:
+            - id: start_stage_by_number
+              type: value
+              title: { ru: "ПЕРВЫЙ ЭТАП", en: "FIRST STAGE" }
+              unit: { ru: "", en: "" }
+              vtype: uint8
+              min: 1
+              max: 10
+              step: 1
+              bind: start_stage_by_number
+              persist: true
+              default: 1
+
+            - id: start_stage
+              type: action
+              title: { ru: "СТАРТ ПРОФИЛЯ", en: "PROFILE START" }
+              on_invoke: start_profile
+
+        - id: stage_01
+          type: submenu
+          title: { ru: "ЭТАП 01", en: "STAGE 01" }
+          scope: per_controller
+          children:
+            - id: stage_01_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: uint8
+              min: 30
+              max: 110
+              step: 1
+              bind: profile_stage_01_temp
+              persist: true
+              default: 50
+
+            - id: stage_01_ramps
+              type: value
+              title: { ru: "ПОДЪЕМ", en: "RAMP" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_01_ramps_time
+              persist: true
+              default: 5
+
+            - id: stage_01_hold
+              type: value
+              title: { ru: "УДЕРЖАНИЕ", en: "HOLD" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_01_time
+              persist: true
+              default: 1
+
+        - id: stage_02
+          type: submenu
+          title: { ru: "ЭТАП 02", en: "STAGE 02" }
+          scope: per_controller
+          children:
+            - id: stage_02_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: uint8
+              min: 30
+              max: 110
+              step: 1
+              bind: profile_stage_02_temp
+              persist: true
+              default: 60
+
+            - id: stage_02_ramps
+              type: value
+              title: { ru: "ПОДЪЕМ", en: "RAMP" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_02_ramps_time
+              persist: true
+              default: 5
+
+            - id: stage_02_hold
+              type: value
+              title: { ru: "УДЕРЖАНИЕ", en: "HOLD" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_02_time
+              persist: true
+              default: 1
+
+        - id: stage_03
+          type: submenu
+          title: { ru: "ЭТАП 03", en: "STAGE 03" }
+          scope: per_controller
+          children:
+            - id: stage_03_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: uint8
+              min: 30
+              max: 110
+              step: 1
+              bind: profile_stage_03_temp
+              persist: true
+              default: 70
+
+            - id: stage_03_ramps
+              type: value
+              title: { ru: "ПОДЪЕМ", en: "RAMP" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_03_ramps_time
+              persist: true
+              default: 5
+
+            - id: stage_03_hold
+              type: value
+              title: { ru: "УДЕРЖАНИЕ", en: "HOLD" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_03_time
+              persist: true
+              default: 1
+
+        - id: stage_04
+          type: submenu
+          title: { ru: "ЭТАП 04", en: "STAGE 04" }
+          scope: per_controller
+          children:
+            - id: stage_04_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: uint8
+              min: 30
+              max: 110
+              step: 1
+              bind: profile_stage_04_temp
+              persist: true
+              default: 60
+
+            - id: stage_04_ramps
+              type: value
+              title: { ru: "ПОДЪЕМ", en: "RAMP" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_04_ramps_time
+              persist: true
+              default: 5
+
+            - id: stage_04_hold
+              type: value
+              title: { ru: "УДЕРЖАНИЕ", en: "HOLD" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_04_time
+              persist: true
+              default: 1
+
+        - id: stage_05
+          type: submenu
+          title: { ru: "ЭТАП 05", en: "STAGE 05" }
+          scope: per_controller
+          children:
+            - id: stage_05_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: uint8
+              min: 30
+              max: 110
+              step: 1
+              bind: profile_stage_05_temp
+              persist: true
+              default: 50
+
+            - id: stage_05_ramps
+              type: value
+              title: { ru: "ПОДЪЕМ", en: "RAMP" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_05_ramps_time
+              persist: true
+              default: 5
+
+            - id: stage_05_hold
+              type: value
+              title: { ru: "УДЕРЖАНИЕ", en: "HOLD" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_05_time
+              persist: true
+              default: 1
+
+        - id: stage_06
+          type: submenu
+          title: { ru: "ЭТАП 06", en: "STAGE 06" }
+          scope: per_controller
+          children:
+            - id: stage_06_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: uint8
+              min: 30
+              max: 110
+              step: 1
+              bind: profile_stage_06_temp
+              persist: true
+              default: 70
+
+            - id: stage_06_ramps
+              type: value
+              title: { ru: "ПОДЪЕМ", en: "RAMP" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_06_ramps_time
+              persist: true
+              default: 5
+
+            - id: stage_06_hold
+              type: value
+              title: { ru: "УДЕРЖАНИЕ", en: "HOLD" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_06_time
+              persist: true
+              default: 1
+
+        - id: stage_07
+          type: submenu
+          title: { ru: "ЭТАП 07", en: "STAGE 07" }
+          scope: per_controller
+          children:
+            - id: stage_07_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: uint8
+              min: 30
+              max: 110
+              step: 1
+              bind: profile_stage_07_temp
+              persist: true
+              default: 90
+
+            - id: stage_07_ramps
+              type: value
+              title: { ru: "ПОДЪЕМ", en: "RAMP" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_07_ramps_time
+              persist: true
+              default: 5
+
+            - id: stage_07_hold
+              type: value
+              title: { ru: "УДЕРЖАНИЕ", en: "HOLD" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_07_time
+              persist: true
+              default: 1
+
+        - id: stage_08
+          type: submenu
+          title: { ru: "ЭТАП 08", en: "STAGE 08" }
+          scope: per_controller
+          children:
+            - id: stage_08_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: uint8
+              min: 30
+              max: 110
+              step: 1
+              bind: profile_stage_08_temp
+              persist: true
+              default: 75
+
+            - id: stage_08_ramps
+              type: value
+              title: { ru: "ПОДЪЕМ", en: "RAMP" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_08_ramps_time
+              persist: true
+              default: 5
+
+            - id: stage_08_hold
+              type: value
+              title: { ru: "УДЕРЖАНИЕ", en: "HOLD" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_08_time
+              persist: true
+              default: 1
+
+        - id: stage_09
+          type: submenu
+          title: { ru: "ЭТАП 09", en: "STAGE 09" }
+          scope: per_controller
+          children:
+            - id: stage_09_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: uint8
+              min: 30
+              max: 110
+              step: 1
+              bind: profile_stage_09_temp
+              persist: true
+              default: 65
+
+            - id: stage_09_ramps
+              type: value
+              title: { ru: "ПОДЪЕМ", en: "RAMP" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_09_ramps_time
+              persist: true
+              default: 5
+
+            - id: stage_09_hold
+              type: value
+              title: { ru: "УДЕРЖАНИЕ", en: "HOLD" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_09_time
+              persist: true
+              default: 1
+
+        - id: stage_10
+          type: submenu
+          title: { ru: "ЭТАП 10", en: "STAGE 10" }
+          scope: per_controller
+          children:
+            - id: stage_10_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: uint8
+              min: 30
+              max: 110
+              step: 1
+              bind: profile_stage_10_temp
+              persist: true
+              default: 55
+
+            - id: stage_10_ramps
+              type: value
+              title: { ru: "ПОДЪЕМ", en: "RAMP" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_10_ramps_time
+              persist: true
+              default: 5
+
+            - id: stage_10_hold
+              type: value
+              title: { ru: "УДЕРЖАНИЕ", en: "HOLD" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 1200
+              step: 1
+              bind: profile_stage_10_time
+              persist: true
+              default: 1
+
+    # --- ПРЕСЕТЫ (ГЛОБАЛЬНО) ---
+    - id: presets
+      type: submenu
+      title: { ru: "ПРЕСЕТЫ", en: "PRESETS" }
+      scope: global
+      children:
+        - id: preset_pla
+          type: submenu
+          title: { ru: "PLA", en: "PLA" }
+          children:
+            - id: preset_pla_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 35
+              max: 55
+              step: 1
+              bind: preset_pla_temp
+              persist: true
+              default: 45.0
+            - id: preset_pla_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_pla_time
+              persist: true
+              default: 240
+            - id: preset_pla_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_pla
+
+        - id: preset_pla_cf
+          type: submenu
+          title: { ru: "PLA-CF", en: "PLA-CF" }
+          children:
+            - id: preset_pla_cf_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 35
+              max: 55
+              step: 1
+              bind: preset_pla_cf_temp
+              persist: true
+              default: 45.0
+            - id: preset_pla_cf_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_pla_cf_time
+              persist: true
+              default: 240
+            - id: preset_pla_cf_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_pla_cf
+
+        - id: preset_pla_gf
+          type: submenu
+          title: { ru: "PLA-GF", en: "PLA-GF" }
+          children:
+            - id: preset_pla_gf_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 35
+              max: 55
+              step: 1
+              bind: preset_pla_gf_temp
+              persist: true
+              default: 45.0
+            - id: preset_pla_gf_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_pla_gf_time
+              persist: true
+              default: 240
+            - id: preset_pla_gf_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_pla_gf
+
+        - id: preset_petg
+          type: submenu
+          title: { ru: "PETG", en: "PETG" }
+          children:
+            - id: preset_petg_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 50
+              max: 70
+              step: 1
+              bind: preset_petg_temp
+              persist: true
+              default: 60.0
+            - id: preset_petg_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_petg_time
+              persist: true
+              default: 180
+            - id: preset_petg_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_petg
+
+        - id: preset_petg_cf
+          type: submenu
+          title: { ru: "PETG-CF", en: "PETG-CF" }
+          children:
+            - id: preset_petg_cf_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 55
+              max: 75
+              step: 1
+              bind: preset_petg_cf_temp
+              persist: true
+              default: 65.0
+            - id: preset_petg_cf_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_petg_cf_time
+              persist: true
+              default: 180
+            - id: preset_petg_cf_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_petg_cf
+
+        - id: preset_petg_gf
+          type: submenu
+          title: { ru: "PETG-GF", en: "PETG-GF" }
+          children:
+            - id: preset_petg_gf_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 50
+              max: 70
+              step: 1
+              bind: preset_petg_gf_temp
+              persist: true
+              default: 60.0
+            - id: preset_petg_gf_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_petg_gf_time
+              persist: true
+              default: 180
+            - id: preset_petg_gf_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_petg_gf
+
+        - id: preset_abs
+          type: submenu
+          title: { ru: "ABS", en: "ABS" }
+          children:
+            - id: preset_abs_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 70
+              max: 90
+              step: 1
+              bind: preset_abs_temp
+              persist: true
+              default: 80.0
+            - id: preset_abs_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_abs_time
+              persist: true
+              default: 240
+            - id: preset_abs_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_abs
+
+        - id: preset_abs_cf
+          type: submenu
+          title: { ru: "ABS-CF", en: "ABS-CF" }
+          children:
+            - id: preset_abs_cf_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 80
+              max: 100
+              step: 1
+              bind: preset_abs_cf_temp
+              persist: true
+              default: 90.0
+            - id: preset_abs_cf_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_abs_cf_time
+              persist: true
+              default: 240
+            - id: preset_abs_cf_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_abs_cf
+
+        - id: preset_abs_gf
+          type: submenu
+          title: { ru: "ABS-GF", en: "ABS-GF" }
+          children:
+            - id: preset_abs_gf_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 80
+              max: 100
+              step: 1
+              bind: preset_abs_gf_temp
+              persist: true
+              default: 90.0
+            - id: preset_abs_gf_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_abs_gf_time
+              persist: true
+              default: 240
+            - id: preset_abs_gf_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_abs_gf
+
+        - id: preset_pa
+          type: submenu
+          title: { ru: "PA", en: "PA" }
+          children:
+            - id: preset_pa_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 80
+              max: 100
+              step: 1
+              bind: preset_pa_temp
+              persist: true
+              default: 90.0
+            - id: preset_pa_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_pa_time
+              persist: true
+              default: 240
+            - id: preset_pa_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_pa
+
+        - id: preset_pa_cf
+          type: submenu
+          title: { ru: "PA-CF", en: "PA-CF" }
+          children:
+            - id: preset_pa_cf_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 90
+              max: 110
+              step: 1
+              bind: preset_pa_cf_temp
+              persist: true
+              default: 100.0
+            - id: preset_pa_cf_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_pa_cf_time
+              persist: true
+              default: 240
+            - id: preset_pa_cf_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_pa_cf
+
+        - id: preset_pa_gf
+          type: submenu
+          title: { ru: "PA-GF", en: "PA-GF" }
+          children:
+            - id: preset_pa_gf_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 90
+              max: 110
+              step: 1
+              bind: preset_pa_gf_temp
+              persist: true
+              default: 100.0
+            - id: preset_pa_gf_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_pa_gf_time
+              persist: true
+              default: 240
+            - id: preset_pa_gf_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_pa_gf
+
+        - id: preset_pc
+          type: submenu
+          title: { ru: "PC", en: "PC" }
+          children:
+            - id: preset_pc_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 90
+              max: 110
+              step: 1
+              bind: preset_pc_temp
+              persist: true
+              default: 100.0
+            - id: preset_pc_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_pc_time
+              persist: true
+              default: 360
+            - id: preset_pc_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_pc
+
+        - id: preset_pc_cf
+          type: submenu
+          title: { ru: "PC-CF", en: "PC-CF" }
+          children:
+            - id: preset_pc_cf_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 90
+              max: 110
+              step: 1
+              bind: preset_pc_cf_temp
+              persist: true
+              default: 100.0
+            - id: preset_pc_cf_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_pc_cf_time
+              persist: true
+              default: 360
+            - id: preset_pc_cf_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_pc_cf
+
+        - id: preset_my1
+          type: submenu
+          title: { ru: "MY1", en: "MY1" }
+          children:
+            - id: preset_my1_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 60
+              max: 80
+              step: 1
+              bind: preset_my1_temp
+              persist: true
+              default: 70.0
+            - id: preset_my1_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_my1_time
+              persist: true
+              default: 360
+            - id: preset_my1_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_my1
+
+        - id: preset_my2
+          type: submenu
+          title: { ru: "MY2", en: "MY2" }
+          children:
+            - id: preset_my2_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 70
+              max: 90
+              step: 1
+              bind: preset_my2_temp
+              persist: true
+              default: 80.0
+            - id: preset_my2_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_my2_time
+              persist: true
+              default: 360
+            - id: preset_my2_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_my2
+
+        - id: preset_my3
+          type: submenu
+          title: { ru: "MY3", en: "MY3" }
+          children:
+            - id: preset_my3_temp
+              type: value
+              title: { ru: "ТЕМПЕРАТУРА", en: "TEMPERATURE" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 80
+              max: 100
+              step: 1
+              bind: preset_my3_temp
+              persist: true
+              default: 90.0
+            - id: preset_my3_time
+              type: value
+              title: { ru: "ВРЕМЯ", en: "TIME" }
+              unit: { ru: "мин", en: "min" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 5
+              bind: preset_my3_time
+              persist: true
+              default: 360
+            - id: preset_my3_start
+              type: action
+              title: { ru: "СТАРТ", en: "START" }
+              on_invoke: start_drying_my3
+
+    - id: scales
+      type: submenu
+      title: { ru: "ВЕСЫ", en: "SCALES" }
+      scope: global
+      children:
+        - id: scales_count
+          type: value
+          title: { ru: "КОЛ-ВО МОДУЛЕЙ", en: "NUMBER OF MODULES" }
+          vtype: uint8
+          min: 0
+          max: 4
+          step: 1
+          bind: scales_count
+          persist: true
+          default: 0
+          on_change: scales_count_set
+
+        - id: tare
+          type: submenu
+          title: { ru: "ТАРА", en: "TARE" }
+          children:
+            - id: tare_spool1
+              type: value
+              title: { ru: "КАТУШКА 1", en: "SPOOL 1" }
+              unit: { ru: "г", en: "g" }
+              vtype: float
+              min: 0
+              max: 2000
+              step: 1
+              bind: tare_spool1
+              persist: true
+              default: 0.0
+            - id: tare_spool2
+              type: value
+              title: { ru: "КАТУШКА 2", en: "SPOOL 2" }
+              unit: { ru: "г", en: "g" }
+              vtype: float
+              min: 0
+              max: 2000
+              step: 1
+              bind: tare_spool2
+              persist: true
+              default: 0.0
+            - id: tare_spool3
+              type: value
+              title: { ru: "КАТУШКА 3", en: "SPOOL 3" }
+              unit: { ru: "г", en: "g" }
+              vtype: float
+              min: 0
+              max: 2000
+              step: 1
+              bind: tare_spool3
+              persist: true
+              default: 0.0
+            - id: tare_spool4
+              type: value
+              title: { ru: "КАТУШКА 4", en: "SPOOL 4" }
+              unit: { ru: "г", en: "g" }
+              vtype: float
+              min: 0
+              max: 2000
+              step: 1
+              bind: tare_spool4
+              persist: true
+              default: 0.0
+
+        - id: calibration
+          type: submenu
+          title: { ru: "КАЛИБРОВКА", en: "CALIBRATION" }
+          children:
+            - id: calib_spool1
+              type: submenu
+              title: { ru: "КАТУШКА 1", en: "SPOOL 1" }
+              children:
+                - id: calib_zero1
+                  type: action
+                  title: { ru: "ПРИНЯТЬ НОЛЬ", en: "SET ZERO" }
+                  on_invoke: calib_zero1
+                - id: calib_kg_1
+                  type: action
+                  title: { ru: "ПРИНЯТЬ 1000 Г", en: "SET 1000 G" }
+                  on_invoke: calib_kg_1
+            - id: calib_spool2
+              type: submenu
+              title: { ru: "КАТУШКА 2", en: "SPOOL 2" }
+              children:
+                - id: calib_zero2
+                  type: action
+                  title: { ru: "ПРИНЯТЬ НОЛЬ", en: "SET ZERO" }
+                  on_invoke: calib_zero2
+                - id: calib_kg_2
+                  type: action
+                  title: { ru: "ПРИНЯТЬ 1000 Г", en: "SET 1000 G" }
+                  on_invoke: calib_kg_2
+
+            - id: calib_spool3
+              type: submenu
+              title: { ru: "КАТУШКА 3", en: "SPOOL 3" }
+              children:
+                - id: calib_zero3
+                  type: action
+                  title: { ru: "ПРИНЯТЬ НОЛЬ", en: "SET ZERO" }
+                  on_invoke: calib_zero3
+                - id: calib_kg_3
+                  type: action
+                  title: { ru: "ПРИНЯТЬ 1000 Г", en: "SET 1000 G" }
+                  on_invoke: calib_kg_3
+
+            - id: calib_spool4
+              type: submenu
+              title: { ru: "КАТУШКА 4", en: "SPOOL 4" }
+              children:
+                - id: calib_zero4
+                  type: action
+                  title: { ru: "ПРИНЯТЬ НОЛЬ", en: "SET ZERO" }
+                  on_invoke: calib_zero4
+                - id: calib_kg_4
+                  type: action
+                  title: { ru: "ПРИНЯТЬ 1000 Г", en: "SET 1000 G" }
+                  on_invoke: calib_kg_4
+
+    # --- НАСТРОЙКИ (ПО КОНТРОЛЛЕРАМ) ---
+    - id: settings
+      type: submenu
+      title: { ru: "НАСТРОЙКИ", en: "SETTINGS" }
+      scope: per_controller
+      children:
+        - id: storage_logic
+          type: submenu
+          title: { ru: "ХРАНЕНИЕ", en: "STORAGE" }
+          scope: per_controller
+          children:
+            - id: storage_auto
+              type: toggle
+              title: { ru: "АВТО ХРАНЕНИЕ", en: "AUTO STORAGE" }
+              vtype: bool
+              bind: storage_auto
+              persist: true
+              default: true
+
+            - id: storage_auto_dry
+              type: toggle
+              title: { ru: "АВТО СУШКА", en: "AUTO DRY" }
+              vtype: bool
+              bind: storage_auto_dry
+              persist: true
+              default: true
+
+            # --- ЕСЛИ ПРИОРИТЕТ ВЛАЖНОСТЬ ---
+            - id: storage_rh
+              type: submenu
+              title: { ru: "ПО ВЛАЖНОСТИ", en: "BY HUMID" }
+              children:
+                - id: storage_rh_hyst
+                  type: value
+                  title: { ru: "ГИСТЕРЕЗИС %", en: "HYSTERESIS %" }
+                  unit: { ru: "%", en: "%" }
+                  vtype: uint8
+                  min: 1
+                  max: 10
+                  step: 1
+                  bind: storage_rh_hyst
+                  persist: true
+                  default: 5
+
+            # --- ЕСЛИ ПРИОРИТЕТ ТЕМПЕРАТУРА ---
+            - id: storage_temp_setup
+              type: submenu
+              title: { ru: "ПО ТЕМПЕРАТУРЕ", en: "BY TEMP" }
+              children:
+                - id: storage_dry_temp_mode
+                  type: toggle
+                  title: { ru: "АБС/%СУШКИ", en: "ABS/%DRY" }
+                  vtype: bool
+                  bind: storage_dry_temp_mode
+                  persist: true
+                  default: false # false = абсолютная температура, true = % от сушки
+
+                - id: storage_dry_temp_by_dry_temp
+                  type: value
+                  title: { ru: "% ОТ T СУШКИ", en: "% OF DRY TEMP" }
+                  unit: { ru: "%", en: "%" }
+                  vtype: uint8
+                  min: 50
+                  max: 100
+                  step: 1
+                  bind: storage_dry_temp_by_dry_temp
+                  persist: true
+                  default: 90
+
+            # --- ОБЩИЕ НАСТРОЙКИ ---
+            - id: storage_common
+              type: submenu
+              title: { ru: "ОБЩЕЕ", en: "COMMON" }
+              children:
+                - id: storage_min_hold_sec
+                  type: value
+                  title: { ru: "МИН. СОСТОЯНИЕ", en: "MIN HOLD" }
+                  unit: { ru: "с", en: "s" }
+                  vtype: uint16
+                  min: 5
+                  max: 600
+                  step: 5
+                  bind: storage_min_hold_sec
+                  persist: true
+                  default: 30
+
+        - id: PID_heater
+          type: submenu
+          title: { ru: "ПИД НАГРЕВАТЕЛЬ", en: "PID HEATER" }
+          children:
+            - id: pid_kp_heater
+              type: value
+              title: { ru: "КП", en: "Kp" }
+              vtype: float
+              min: 0.1
+              max: 1000
+              step: 0.1
+              bind: pid_kp_heater
+              persist: true
+              default: 9.810
+              on_change: pid_recalc_heater
+            - id: pid_ki_heater
+              type: value
+              title: { ru: "КИ", en: "Ki" }
+              vtype: float
+              min: 0
+              max: 1000
+              step: 0.01
+              bind: pid_ki_heater
+              persist: true
+              default: 0.084
+              on_change: pid_recalc_heater
+            - id: pid_kd_heater
+              type: value
+              title: { ru: "КД", en: "Kd" }
+              vtype: float
+              min: 0
+              max: 1000
+              step: 0.1
+              bind: pid_kd_heater
+              persist: true
+              default: 87.825
+              on_change: pid_recalc_heater
+            - id: pid_gain_heater
+              type: value
+              title: { ru: "GAIN", en: "GAIN" }
+              unit: { ru: "×", en: "×" }
+              vtype: float
+              min: 0.1
+              max: 50.0
+              step: 0.01
+              bind: pid_gain_heater
+              persist: true
+              default: 9.810
+              on_change: pid_recalc_gain_heater
+            - id: pid_autotune_heater
+              type: action
+              title: { ru: "Автопид", en: "Autopid" }
+              on_invoke: pid_autotune_heater
+
+        - id: PID_chamber
+          type: submenu
+          title: { ru: "ПИД ВОЗДУХ", en: "PID CHAMBER" }
+          children:
+            - id: pid_kp_chamber
+              type: value
+              title: { ru: "КП", en: "Kp" }
+              vtype: float
+              min: 0.1
+              max: 1000
+              step: 0.1
+              bind: pid_kp_chamber
+              persist: true
+              default: 5.873
+              on_change: pid_recalc_chamber
+            - id: pid_ki_chamber
+              type: value
+              title: { ru: "КИ", en: "Ki" }
+              vtype: float
+              min: 0
+              max: 1000
+              step: 0.01
+              bind: pid_ki_chamber
+              persist: true
+              default: 0.18 #0.018
+              on_change: pid_recalc_chamber
+            - id: pid_kd_chamber
+              type: value
+              title: { ru: "КД", en: "Kd" }
+              vtype: float
+              min: 0
+              max: 1000
+              step: 0.1
+              bind: pid_kd_chamber
+              persist: true
+              default: 50.402 #147.402
+              on_change: pid_recalc_chamber
+            - id: pid_gain_chamber
+              type: value
+              title: { ru: "GAIN", en: "GAIN" }
+              unit: { ru: "×", en: "×" }
+              vtype: float
+              min: 0.1
+              max: 200.0
+              step: 0.01
+              bind: pid_gain_chamber
+              persist: true
+              default: 5.873
+              on_change: pid_recalc_gain_chamber
+            - id: pid_autotune_chamber
+              type: action
+              title: { ru: "Автопид", en: "Autopid" }
+              on_invoke: pid_autotune_chamber
+
+        - id: heating
+          type: submenu
+          title: { ru: "НАГРЕВ", en: "HEATING" }
+          children:
+            - id: heater_max_temp
+              type: value
+              title: { ru: "МАКС.НАГРЕВАТЕЛЬ", en: "MAX TEMP" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 30
+              max: 150
+              step: 1
+              bind: heater_max_temp
+              persist: true
+              default: 130.0
+            - id: air_max_temp
+              type: value
+              title: { ru: "МАКС.ТЕМП.ВОЗДУХ", en: "MAX AIR TEMP" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 30
+              max: 120
+              step: 1
+              bind: air_max_temp
+              persist: true
+              default: 90.0
+            - id: delta
+              type: value
+              title: { ru: "ДЕЛЬТА", en: "DELTA" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: uint8
+              min: 0
+              max: 55
+              step: 1
+              bind: delta_c
+              persist: true
+              default: 40
+            - id: heater_delta_is_percent
+              type: toggle
+              title: { ru: "ДЕЛЬТА АБС/%", en: "DELTA ABS/%" }
+              vtype: bool
+              bind: heater_delta_is_percent
+              persist: true
+              default: false # false = абсолютная температура, true = % от дельты
+
+            - id: heating_check
+              type: submenu
+              title: { ru: "ПРОВЕРКА", en: "CHECK" }
+              children:
+                - id: vh_max_err
+                  type: value
+                  title: { ru: "ПОРОГ ОШИБКИ", en: "ERROR LIMIT" }
+                  vtype: float
+                  min: 0
+                  max: 500
+                  step: 10
+                  bind: vh_max_err
+                  persist: true
+                  default: 250.0
+                - id: vh_heating_gain
+                  type: value
+                  title: { ru: "ПРИРОСТ T", en: "TEMP GAIN" }
+                  unit: { ru: "°C", en: "°C" }
+                  vtype: float
+                  min: 0.1
+                  max: 10.0
+                  step: 0.1
+                  bind: vh_heating_gain
+                  persist: true
+                  default: 0.3
+                - id: vh_check_gain_time
+                  type: value
+                  title: { ru: "ОКНО ПРОВЕРКИ", en: "CHECK WINDOW" }
+                  unit: { ru: "с", en: "s" }
+                  vtype: uint16
+                  min: 5
+                  max: 120
+                  step: 1
+                  bind: vh_check_gain_time_s
+                  persist: true
+                  default: 60
+                - id: vh_arm_pwm_min
+                  type: value
+                  title: { ru: "ШИМ СТАРТ %", en: "PWM START %" }
+                  unit: { ru: "%", en: "%" }
+                  vtype: uint8
+                  min: 10
+                  max: 100
+                  step: 5
+                  bind: vh_arm_pwm_min_pct
+                  persist: true
+                  default: 70
+
+        - id: fan
+          type: submenu
+          title: { ru: "ВЕНТИЛЯТОР", en: "FAN" }
+          children:
+            - id: fan_temp_on
+              type: value
+              title: { ru: "ПОРОГ T ВКЛ", en: "ON THRESHOLD" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 40
+              max: 70
+              step: 0.5
+              bind: fan_temp_on_c
+              persist: true
+              default: 55.0
+
+            - id: fan_hyst
+              type: value
+              title: { ru: "ГИСТЕРЕЗИС", en: "HYSTERESIS" }
+              unit: { ru: "°C", en: "°C" }
+              vtype: float
+              min: 5
+              max: 20
+              step: 0.5
+              bind: fan_hyst_c
+              persist: true
+              default: 5.0
+
+        - id: servo
+          type: submenu
+          title: { ru: "СЕРВО", en: "SERVO" }
+          children:
+            - id: servo_closed_angle
+              type: value
+              title: { ru: "ЗАКРЫТО УГОЛ", en: "CLOSED ANGLE" }
+              unit: { ru: "°", en: "°" }
+              vtype: uint8
+              min: 0
+              max: 180
+              step: 1
+              bind: servo_closed_angle
+              persist: true
+              default: 20
+              on_change: on_servo_preview
+            - id: servo_open_angle
+              type: value
+              title: { ru: "ОТКРЫТО УГОЛ", en: "OPEN ANGLE" }
+              unit: { ru: "°", en: "°" }
+              vtype: uint8
+              min: 0
+              max: 180
+              step: 1
+              bind: servo_open_angle
+              persist: true
+              default: 50
+              on_change: on_servo_preview
+
+            - id: servo_time_closed
+              type: value
+              title: { ru: "ВРЕМЯ ЗАКРЫТО", en: "CLOSED TIME" }
+              unit: { ru: "с", en: "s" }
+              vtype: uint16
+              min: 0
+              max: 3600
+              step: 1
+              bind: servo_time_closed
+              persist: true
+              default: 600
+
+            - id: servo_time_open
+              type: value
+              title: { ru: "ВРЕМЯ ОТКРЫТО", en: "OPEN TIME" }
+              unit: { ru: "с", en: "s" }
+              vtype: uint16
+              min: 0
+              max: 600
+              step: 1
+              bind: servo_time_open
+              persist: true
+              default: 30
+
+            - id: servo_smart_mode
+              type: toggle
+              title: { ru: "УМНЫЙ РЕЖИМ", en: "SMART MODE" }
+              vtype: bool
+              bind: servo_smart_mode
+              persist: true
+              default: false
+
+    - id: global_settings
+      type: submenu
+      title: { ru: "ОБЩИЕ", en: "GLOBAL" }
+      children:
+        - id: piortal
+          type: submenu
+          title: { ru: "ПОРТАЛ", en: "PORTAL" }
+          children:
+            - id: start_claim
+              type: action
+              title: { ru: "СВЯЗАТЬ", en: "CLAIM" }
+              on_invoke: start_claim
+
+            # --- БЛОКИРОВКА КОМАНД (ГЛОБАЛЬНО) ---
+            # Source of truth для remote-control gate. ESP-мост подхватывает
+            # значение из UART Status и зеркалит в SDK через setIgnoreExternalCmd.
+            - id: ignore_external_cmd
+              type: toggle
+              title: { ru: "ИГНОР КОМАНД", en: "IGNOR EXT CMD" }
+              vtype: bool
+              bind: ign_ext_cmd
+              role: system.ignore_external_cmd
+              persist: true
+              scope: global
+              default: false
+
+        - id: session_count
+          type: submenu
+          title: { ru: "СЧЕТЧИК СЕССИЙ", en: "SESSION COUNTER" }
+          children:
+            - id: drying_session_count
+              type: value
+              title: { ru: "СУШКА", en: "DRYING" }
+              vtype: uint16
+              min: 0
+              max: 65535
+              step: 1
+              bind: drying_session_count
+              persist: true
+              scope: global
+              default: 0
+
+            - id: storage_session_count
+              type: value
+              title: { ru: "ХРАНЕНИЕ", en: "STORAGE" }
+              vtype: uint16
+              min: 0
+              max: 65535
+              step: 1
+              bind: storage_session_count
+              persist: true
+              scope: global
+              default: 0
+
+            - id: profile_session_count
+              type: value
+              title: { ru: "ПРОФИЛЬ", en: "PROFILE" }
+              vtype: uint16
+              min: 0
+              max: 65535
+              step: 1
+              bind: profile_session_count
+              persist: true
+              scope: global
+              default: 0
+
+        #* --- КОНФИГУРАЦИЯ ПОРТОВ (ГЛОБАЛЬНО) ---
+        - id: hardware_config
+          type: submenu
+          title: { ru: "КОНФИГУРАЦИЯ ПОРТОВ", en: "PORT CONFIG" }
+          scope: global
+          children:
+            - id: port1_mode
+              type: value
+              title: { ru: "ПОРТ 1", en: "PORT 1" }
+              vtype: uint8
+              min: 0
+              max: 3
+              step: 1
+              bind: port1_mode
+              persist: true
+              scope: global
+              default: 2 # SCALES
+
+            - id: port2_mode
+              type: value
+              title: { ru: "ПОРТ 2", en: "PORT 2" }
+              vtype: uint8
+              min: 0
+              max: 3
+              step: 1
+              bind: port2_mode
+              persist: true
+              scope: global
+              default: 3 # LINK
+
+            - id: port3_mode
+              type: value
+              title: { ru: "ПОРТ 3", en: "PORT 3" }
+              vtype: uint8
+              min: 0
+              max: 3
+              step: 1
+              bind: port3_mode
+              persist: true
+              scope: global
+              default: 1 # SCREEN
+
+        # --- WEBSOCKET LOCAL ACCESS (ГЛОБАЛЬНО) ---
+        - id: ws_local
+          type: submenu
+          title: { ru: "WS ЛОКАЛЬНЫЙ", en: "WS LOCAL" }
+          children:
+            - id: ws_enabled
+              type: toggle
+              title: { ru: "ВКЛ/ВЫКЛ", en: "ON/OFF" }
+              vtype: bool
+              bind: ws_enabled
+              persist: true
+              scope: global
+              default: false
+              on_change: ws_toggle
+
+        #* --- КОЛ-ВО ЮНИТОВ (ГЛОБАЛЬНО) --- ВСЕГДА ПЕРДПОСЛЕДЕДНИЙ ---
+        - id: units_count
+          type: value
+          title: { ru: "КОЛ-ВО ЮНИТОВ", en: "UNITS" }
+          vtype: uint8
+          min: 1
+          max: 3 # NUM_UNITS=3
+          step: 1
+          bind: units_count
+          persist: true
+          scope: global
+          default: 1
+          on_change: units_count_set
+
+        #* --- ЯЗЫК (ГЛОБАЛЬНО) --- ВСЕГДА ПОСЛЕДНИЙ ---
+        - id: language
+          type: value
+          title: { ru: "ЯЗЫК", en: "LANGUAGE" }
+          vtype: uint8
+          min: 0
+          max: 1
+          step: 1
+          bind: language
+          persist: true
+          scope: global
+          default: 1
+          on_change: on_language_changed
+          apply: live

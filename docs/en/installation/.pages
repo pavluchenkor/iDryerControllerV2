@@ -1,0 +1,4 @@
+title: Installation and Configuration
+nav:
+  - Flash Controller: firmware-install.md
+  - Port Configuration: port-config.md

@@ -1,0 +1,9 @@
+title: iDryerControllerV2
+nav:
+  - Обзор: README.md
+  - Установка: installation
+  - Оборудование: hardware
+  - Работа: operation
+  - Протокол: protocol
+  - FAQ: faq
+  - Тестирование: testing

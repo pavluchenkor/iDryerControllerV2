@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/schema/library.json",
+  "name": "pn532",
+  "description": "Local PN532 fork for iDryer with split-phase SPI detection helpers.",
+  "version": "0.1.0",
+  "frameworks": ["arduino"],
+  "platforms": ["*"],
+  "headers": [
+    "PN532.h",
+    "PN532_HSU.h",
+    "PN532_I2C.h",
+    "PN532_SPI.h",
+    "PN532_SWHSU.h"
+  ],
+  "build": {
+    "includeDir": "src"
+  }
+}

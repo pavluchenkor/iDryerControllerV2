@@ -1,0 +1,10 @@
+Mode,Description,Board,Port0,Port1,Port2,Port3,UART_GPIO,Max_Units,Has_Scales,Notes
+R_1_0_EXT_EXT_SCR,2 EXT units + Screen,R1.0,MAIN,EXT,EXT,SCR,0/1,3,N,Экран на порту 3 UART на 0/1
+R_1_0_EXT_SCL_SCR,1 EXT + Scales + Screen,R1.0,MAIN,EXT,SCL,SCR,0/1,2,Y,Весы на 2 (GPIO4/5 заняты) UART на 0/1
+R_1_0_iDryerX_SCR_SCL_LNK,iDryerX Full (Screen+Scales+WiFi),R1.0,MAIN,SCR,SCL,LNK,0/1,1,Y,Полная: экран на I2C весы на 2 WiFi на 3 (UART 0/1)
+EXT_LNK_SCR,1 EXT + WiFi + Screen,R1.0,MAIN,EXT,LNK,SCR,4/5,2,N,WiFi на 2 (UART 4/5) экран на 3
+R_1_0_EXT_EXT_TCH,2 EXT units + Touch,R1.0,MAIN,EXT,EXT,TCH,0/1,3,N,Тач на порту 3 UART на 0/1
+R_1_0_EXT_SCL_TCH,1 EXT + Scales + Touch,R1.0,MAIN,EXT,SCL,TCH,0/1,2,Y,Весы на 2 тач на 3 UART на 0/1
+R_2_0_EXT_SCL_SCR,1 EXT + Scales + Screen,R2.0,MAIN,EXT,SCL,SCR,16/17,2,Y,R2.0: WiFi всегда на 16/17 RFID auto-detect
+R_2_0_NEW_TOUCH,Touch + Scales (+ WiFi),R2.0,MAIN,NONE,SCL,TCH,16/17,1,Y,R2.0: тач на 3 WiFi на 16/17 RFID auto-detect
+R_2_0_NEW_DUAL,Screen + Scales + WiFi + Touch,R2.0,MAIN,SCR,SCL,TCH,16/17,1,Y,R2.0: экран I2C тач на 3 (0/1) WiFi на 16/17
