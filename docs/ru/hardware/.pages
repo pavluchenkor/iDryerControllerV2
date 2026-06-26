@@ -1,6 +1,6 @@
 title: Подключение оборудования
 nav:
   - Экран: wiring-screen.md
-  - Весовой датчик: weight-sensor.md
+  - Датчик веса: weight-sensor.md
   - RFID-ридер: rfid.md
   - WiFi-модуль: wifi-module.md
