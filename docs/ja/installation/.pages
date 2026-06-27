@@ -1,0 +1,5 @@
+title: インストールと設定
+nav:
+  - コントローラーファームウェア: firmware-install.md
+  - ポート設定: port-config.md
+

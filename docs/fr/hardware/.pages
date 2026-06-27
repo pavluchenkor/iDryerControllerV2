@@ -1,0 +1,7 @@
+title: Connexions matérielles
+nav:
+  - Écran: wiring-screen.md
+  - Capteur de poids: weight-sensor.md
+  - Lecteur RFID: rfid.md
+  - Module WiFi: wifi-module.md
+

@@ -1,0 +1,7 @@
+title: 硬件连接
+nav:
+  - 屏幕: wiring-screen.md
+  - 重量传感器: weight-sensor.md
+  - RFID 读卡器: rfid.md
+  - WiFi 模块: wifi-module.md
+

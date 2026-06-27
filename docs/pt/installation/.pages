@@ -1,0 +1,5 @@
+title: Instalação e configuração
+nav:
+  - Firmware do controlador: firmware-install.md
+  - Configuração de portas: port-config.md
+

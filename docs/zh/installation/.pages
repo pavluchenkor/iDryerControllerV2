@@ -1,0 +1,5 @@
+title: 安装与配置
+nav:
+  - 控制器固件: firmware-install.md
+  - 端口配置: port-config.md
+

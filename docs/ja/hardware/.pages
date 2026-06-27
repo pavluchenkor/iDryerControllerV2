@@ -1,0 +1,7 @@
+title: ハードウェア接続
+nav:
+  - 画面: wiring-screen.md
+  - 重量センサー: weight-sensor.md
+  - RFIDリーダー: rfid.md
+  - WiFiモジュール: wifi-module.md
+

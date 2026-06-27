@@ -1,0 +1,7 @@
+title: Připojení hardwaru
+nav:
+  - Displej: wiring-screen.md
+  - Snímač hmotnosti: weight-sensor.md
+  - RFID čtečka: rfid.md
+  - WiFi modul: wifi-module.md
+

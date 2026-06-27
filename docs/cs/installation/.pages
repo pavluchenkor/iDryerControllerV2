@@ -1,0 +1,5 @@
+title: Instalace a konfigurace
+nav:
+  - Firmware kontroléru: firmware-install.md
+  - Konfigurace portů: port-config.md
+

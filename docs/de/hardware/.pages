@@ -1,0 +1,7 @@
+title: Hardware-Anschlüsse
+nav:
+  - Display: wiring-screen.md
+  - Gewichtssensor: weight-sensor.md
+  - RFID-Leser: rfid.md
+  - WiFi-Modul: wifi-module.md
+

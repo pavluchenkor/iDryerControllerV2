@@ -1,0 +1,7 @@
+title: 硬體連接
+nav:
+  - 螢幕: wiring-screen.md
+  - 重量感測器: weight-sensor.md
+  - RFID 讀卡器: rfid.md
+  - WiFi 模組: wifi-module.md
+

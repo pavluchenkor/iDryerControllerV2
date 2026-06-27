@@ -1,0 +1,7 @@
+title: Conexiones de hardware
+nav:
+  - Pantalla: wiring-screen.md
+  - Sensor de peso: weight-sensor.md
+  - Lector RFID: rfid.md
+  - Módulo WiFi: wifi-module.md
+

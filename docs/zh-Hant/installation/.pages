@@ -1,0 +1,5 @@
+title: 安裝與設定
+nav:
+  - 控制器韌體: firmware-install.md
+  - 連接埠設定: port-config.md
+
