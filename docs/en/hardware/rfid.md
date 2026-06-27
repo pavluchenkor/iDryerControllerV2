@@ -1,4 +1,8 @@
-# RC522 RFID Reader Connection
+# RFID
+
+Coming soon
+
+<!-- # RC522 RFID Reader Connection
 
 ## Connection via RJ45
 
@@ -30,4 +34,4 @@ SDA | SCL | PSH | TRA | TRB | BAK | GND | VCC
 - 5 (IRQ) → FAN
 - 6 (RST) → H
 - 7 (SCL) → SCL
-- 8 (GND) → GND
+- 8 (GND) → GND -->

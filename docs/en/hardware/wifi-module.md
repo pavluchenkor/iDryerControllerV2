@@ -1,4 +1,9 @@
-# ESP32-C3 ↔ RP2040 Connection via UART
+# Wi-Fi
+
+Read the iDryer-Link section
+
+
+<!-- # ESP32-C3 ↔ RP2040 Connection via UART
 
 ## Wire designation (by color)
 
@@ -40,4 +45,4 @@ And **common GND is mandatory**.
 
  ... | ... | RX  | TX  | ... | ... | GND | VCC
   |     |     |     |     |     |     |     |
-1(WO) 7(WBr)3(WG) 5(WB) 6(G)  4(B)  8(Br) 2(O)
+1(WO) 7(WBr)3(WG) 5(WB) 6(G)  4(B)  8(Br) 2(O) -->

@@ -20,7 +20,7 @@ Website: <https://install.idryer.org/>
 Windows may not recognize RP2040 for WebUSB without WinUSB driver. Options:
 
 - **Web installer:** install driver via [Zadig](https://zadig.akeo.ie/) (Options → List All Devices → select "RP2 Boot" → WinUSB → Install Driver).
-- **Direct UF2 download:** click **💻 Windows Instructions** button on the website to download `.uf2` files and copy to `RPI-RP2` drive.
+- **Direct UF2 download:** click **Windows Instructions** button on the website to download `.uf2` files and copy to `RPI-RP2` drive.
 
 ## Flashing steps
 

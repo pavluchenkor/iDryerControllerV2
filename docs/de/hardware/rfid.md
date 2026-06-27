@@ -1,13 +1,13 @@
 # RFID
 
-Скоро
+Bald verfügbar
 
-<!-- # Подключение RFID-ридера RC522
+<!-- # RC522 RFID-Leser verbinden
 
-## Подключение через RJ45
+## Verbindung über RJ45
 
-| Контакт | Назначение |
-|---------|-----------|
+| Kontakt | Zweck |
+|---------|-------|
 | 1(WO)  | SDA |
 | 2(O)   | VCC |
 | 3(WG)  | EA |
@@ -17,7 +17,7 @@
 | 7(WBr) | SCL |
 | 8(Br)  | GND |
 
-## Схема RJ45
+## RJ45-Schema
 
 ```
 SDA | SCL | PSH | TRA | TRB | BAK | GND | VCC
@@ -25,7 +25,7 @@ SDA | SCL | PSH | TRA | TRB | BAK | GND | VCC
 1(WO) 7(WBr)3(WG) 5(WB) 6(G) 4(B) 8(Br) 2(O)
 ```
 
-## Подключение к контроллеру
+## Anschluss an den Regler
 
 - 1 (SDA) → SDA
 - 2 (5V) → VCC
