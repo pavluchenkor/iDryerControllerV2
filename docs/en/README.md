@@ -1,5 +1,7 @@
 # iDryerControllerV2
 
+![MCU PCB](../img/MCU_PCB.png)
+
 This documentation describes the firmware, connection, and setup of the iDryer controller board.
 
 The project is open to enthusiasts: the firmware can run on RP2040 microcontrollers, and with the required peripherals connected, the controller will be fully functional.

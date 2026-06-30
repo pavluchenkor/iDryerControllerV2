@@ -1,5 +1,7 @@
 # iDryerControllerV2
 
+![MCU PCB](../img/MCU_PCB.png)
+
 Diese Dokumentation beschreibt die Firmware, die Verdrahtung und die Konfiguration des iDryer-Steuerboards.
 
 Das Projekt steht Enthusiasten offen: Die Firmware kann auf RP2040-Mikrocontrollern ausgeführt werden, und mit dem Anschluss der erforderlichen Peripherie ist der Steuercontroller vollständig funktionsfähig.
