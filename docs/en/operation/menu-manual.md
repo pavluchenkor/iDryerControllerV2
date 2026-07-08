@@ -15,14 +15,14 @@
 ![screen interface](../../img/screen-button.png)
 
 1. Encoder.
-   - Rotate — navigate menu items, change values.
-   - Press — confirm selection.
-   - Press and hold — go back (when editing, exits without saving changes).
+    - Rotate — navigate menu items, change values.
+    - Press — confirm selection.
+    - Press and hold — go back (when editing, exits without saving changes).
 2. Button. Switch active UNIT.
 3. Button.
-   - Hold — end current mode.
-   - Long hold — end modes on all UNITs.
-   - Long hold on error — reset error.
+    - Hold — end current mode.
+    - Long hold — end modes on all UNITs.
+    - Long hold on error — reset error.
 
 ## MENU top level
 
