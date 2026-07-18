@@ -2302,6 +2302,35 @@ void handlePendingUartCommands() {
 }
 
 
+// Троттлинг отправки повторяющихся ошибок по UART: одинаковое (src,code,ctrl_id)
+// уходит не чаще раза в ERR_SEND_COOLDOWN_MS, первое событие — сразу. Гасит спам
+// при обрыве/замыкании датчика (SENSOR_INVALID постится каждую итерацию loop).
+// INFO (например STATE_CHANGE) не троттлится — это единичные легитимные события.
+// errlog_append_from_event и ACK обрабатываются всегда (дедуп count живёт в errlog).
+static bool sendUartErrorEventThrottled(const ErrorEvent *ev, uint32_t now) {
+  if (ev->severity == ERRSEV_INFO) return sendUartErrorEvent(ev);
+
+  static const uint32_t ERR_SEND_COOLDOWN_MS = 5000;
+  static const uint8_t SLOTS = 8;
+  static struct { uint16_t code; uint8_t src; uint8_t ctrl; uint32_t last; bool used; } recent[SLOTS] = {};
+
+  int slot = -1, freeSlot = -1;
+  for (uint8_t i = 0; i < SLOTS; ++i) {
+    if (recent[i].used && recent[i].code == (uint16_t)ev->code &&
+        recent[i].src == (uint8_t)ev->source && recent[i].ctrl == ev->ctrl_id) { slot = (int)i; break; }
+    if (!recent[i].used && freeSlot < 0) freeSlot = (int)i;
+  }
+
+  if (slot >= 0) {
+    if (now - recent[slot].last < ERR_SEND_COOLDOWN_MS) return false; // повтор — подавляем
+    recent[slot].last = now;
+  } else {
+    uint8_t i = (freeSlot >= 0) ? (uint8_t)freeSlot : (uint8_t)(now % SLOTS); // нет места — вытесняем
+    recent[i] = { (uint16_t)ev->code, (uint8_t)ev->source, ev->ctrl_id, now, true };
+  }
+  return sendUartErrorEvent(ev);
+}
+
 void safety_supervisor_tick(uint32_t now) {
   static uint32_t last_check = 0;
   if (now - last_check < 100) return;
@@ -2324,7 +2353,7 @@ void safety_supervisor_tick(uint32_t now) {
         ctrl->setMode(DryerMode::Error);
       }
 
-      sendUartErrorEvent(&ev);
+      sendUartErrorEventThrottled(&ev, now);
       ledsShowAlertBreath(LedColors::RED, 500, 1000 * 60 * 60 * 24);
       DEBUG_C("All units stopped due to critical error");
       break;
@@ -2334,18 +2363,18 @@ void safety_supervisor_tick(uint32_t now) {
       auto *ctrl = controllers[ev.ctrl_id];
       ctrl->emergencyStop();
       ctrl->setMode(DryerMode::Idle);
-      sendUartErrorEvent(&ev);
+      sendUartErrorEventThrottled(&ev, now);
       ledsShowAlertBreath(LedColors::ORANGE, 3000, 9000);
       DEBUG_E("Stopping unit %u due to error", ev.ctrl_id);
       break;
     }
     case ERRSEV_WARNING:
       DEBUG_W("%s", line);
-      sendUartErrorEvent(&ev);
+      sendUartErrorEventThrottled(&ev, now);
       ledsShowAlertBreath(LedColors::YELLOW, 3000, 3000);
       break;
     case ERRSEV_INFO:
-      sendUartErrorEvent(&ev);
+      sendUartErrorEventThrottled(&ev, now);
       DEBUG_I("%s", line);
       break;
     default:
