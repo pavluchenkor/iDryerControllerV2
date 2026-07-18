@@ -216,7 +216,7 @@ void rotateToNextUnit(uint32_t now) {
   for (uint8_t k = 0; k < menu.units_count; ++k) {
     uint8_t cand = (uint8_t)((gscr_active_unit + 1 + k) % menu.units_count);
 
-    DryerInputs inCand = readDryerInputs(cand, now);
+    DryerInputs inCand = controllers[cand]->getInputs(); // снимок из inputs_, без side-effect
     //! if (!unitHasData(inCand)) continue; //! пропуск пустых
     gscr_active_unit = cand;
     menu.number_controller = cand;  // Синхронизируем с меню
@@ -235,7 +235,9 @@ void uiTick(uint32_t now, MenuUI &menuUi) {
   const uint8_t u = gscr_active_unit % NUM_UNITS;
   const DryerController *ctrl = (u < NUM_UNITS) ? controllers[u] : nullptr;
   DryerMode mode = ctrl ? ctrl->mode() : DryerMode::Idle;
-  DryerInputs in = readDryerInputs(u, now);
+  // Снимок из inputs_ (main loop обновил перед uiTick) — без дублирующего
+  // sensor tick и report_sensor_error (устраняет удвоение спама событий).
+  DryerInputs in = ctrl ? ctrl->getInputs() : DryerInputs{};
 
   drawScreen(now, in, mode, u, menuUi, ctrl);
 }
