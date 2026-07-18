@@ -287,8 +287,8 @@ void sendUartTelemetry() {
     DryerInputs inputs = controllers[i]->getInputs();
 
     entry.unitId = i;
-    entry.temperatureC10 = (int16_t)(inputs.airTempC * 10);
-    entry.humidityPct10 = (uint16_t)(inputs.airHumRH * 10);
+    entry.setTemperature(inputs.airTempC); // NaN → sentinel (нет данных)
+    entry.setHumidity(inputs.airHumRH);
     entry.heaterPowerPct = (uint8_t)(controllers[i]->heaterPower01() * 100);
     entry.fanOn = controllers[i]->fanOn() ? 1 : 0;
   }

@@ -1934,15 +1934,12 @@ void loop() {
   ota_rp::tickCommitGate(millis(), /*allUnitsIdle=*/!anyActive);
 
   for (uint8_t i = 0; i < menu.units_count; i++) { // для каждого контроллера menu.units_count
-    if (controllers[i]->mode() != DryerMode::Error) {
-      DryerInputs in = readDryerInputs(i, now); // читаем датчики
-      // char label[8];
-      // sprintf(label, "Unit%u", i);                            // печать
-      // данных для каждого контроллера printDryerInputs(label, in, now);
-      controllers[i]->setInputs(in); // передаём контроллеру
-      // printControllerBrief(now, controllers[i]->mode());      // печать
-      // состояния}
-    }
+    // Датчики читаем всегда, включая режим Error: при обрыве readDryerInputs
+    // вернёт NaN → телеметрия отдаст sentinel «нет данных» (разрыв графика на
+    // портале), а не замороженное последнее значение. В Error tick() всё равно
+    // рано выходит (emergencyStop), inputs_ идёт только в телеметрию.
+    DryerInputs in = readDryerInputs(i, now);
+    controllers[i]->setInputs(in);
     controllers[i]->tick();
   }
 
