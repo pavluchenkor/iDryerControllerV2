@@ -289,6 +289,7 @@ void sendUartTelemetry() {
     entry.unitId = i;
     entry.setTemperature(inputs.airTempC); // NaN → sentinel (нет данных)
     entry.setHumidity(inputs.airHumRH);
+    entry.setHeaterTemp(inputs.heaterTempC); // термистор нагревателя; NaN при обрыве → sentinel
     entry.heaterPowerPct = (uint8_t)(controllers[i]->heaterPower01() * 100);
     entry.fanOn = controllers[i]->fanOn() ? 1 : 0;
   }
