@@ -1,6 +1,7 @@
 title: iDryerControllerV2
 nav:
   - Overview: README.md
+  - Quick Start: quick-start.md
   - Installation: installation
   - Hardware: hardware
   - Operation: operation

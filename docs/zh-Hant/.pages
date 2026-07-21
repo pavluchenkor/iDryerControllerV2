@@ -1,6 +1,7 @@
 title: iDryerControllerV2
 nav:
   - 概覽: README.md
+  - 快速上手: quick-start.md
   - 安裝: installation
   - 硬體: hardware
   - 操作: operation
