@@ -139,6 +139,7 @@ static const char *fmtRemain(uint32_t now, uint32_t startMs, uint32_t totalMs, c
   return buf;
 }
 
+#if 0 // CLAIM-ЭКРАН ВРЕМЕННО ОТКЛЮЧЁН
 static const char *claimStatusToStr(idryer::UartClaimStatus st) {
   switch (st) {
   case idryer::UartClaimStatus::Provisioning:
@@ -206,6 +207,7 @@ static void drawClaimScreen(uint32_t now) {
 
   u8g2.sendBuffer();
 }
+#endif // CLAIM-ЭКРАН ВРЕМЕННО ОТКЛЮЧЁН
 
 static inline bool unitHasData(const DryerInputs &in) {
   // юнит пустой, если нет обоих датчиков (оба NaN)
@@ -227,6 +229,16 @@ void rotateToNextUnit(uint32_t now) {
 
 void uiTick(uint32_t now, MenuUI &menuUi) {
   if (!hasScreen()) return;
+
+  // Гашение экрана после SCREEN_OFF_MS без ввода (энкодер/кнопки). Экран ошибок
+  // не гасим. Пробуждение — markUserInput() обновляет g_lastInputMs.
+  static bool screenOff = false;
+  const bool idleLong = (uint32_t)(now - g_lastInputMs) >= SCREEN_OFF_MS;
+  if (idleLong && !g_err_ack_active) {
+    if (!screenOff) { u8g2.setPowerSave(1); screenOff = true; }
+    return;
+  }
+  if (screenOff) { u8g2.setPowerSave(0); screenOff = false; }
 
   if (!g_err_ack_active && (int32_t)(now - gscr_next_unit_rotate_ms) >= 0) {
     rotateToNextUnit(now);
@@ -448,10 +460,12 @@ void drawScreen(uint32_t now, const DryerInputs &in, DryerMode mode, uint8_t uni
     return;
   }
 
-  if (claim_is_visible()) {
-    drawClaimScreen(now);
-    return;
-  }
+  // CLAIM-ЭКРАН ВРЕМЕННО ОТКЛЮЧЁН
+  // claim_tick(now); // авто-скрытие claim-экрана после успешной привязки
+  // if (claim_is_visible()) {
+  //   drawClaimScreen(now);
+  //   return;
+  // }
 
   // Переключение “режим/весы”
   // if (mode != DryerMode::Idle && now >= ss.nextSwapMs) {

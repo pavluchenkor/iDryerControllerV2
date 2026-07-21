@@ -1599,10 +1599,11 @@
           type: submenu
           title: { ru: "ПОРТАЛ", en: "PORTAL" }
           children:
-            - id: start_claim
-              type: action
-              title: { ru: "СВЯЗАТЬ", en: "CLAIM" }
-              on_invoke: start_claim
+            # CLAIM ВРЕМЕННО ОТКЛЮЧЁН
+            # - id: start_claim
+            #   type: action
+            #   title: { ru: "СВЯЗАТЬ", en: "CLAIM" }
+            #   on_invoke: start_claim
 
             # --- БЛОКИРОВКА КОМАНД (ГЛОБАЛЬНО) ---
             # Source of truth для remote-control gate. ESP-мост подхватывает

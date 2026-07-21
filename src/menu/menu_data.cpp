@@ -47,7 +47,6 @@ void calib_zero4(void);
 void calib_kg_4(void);
 void pid_autotune_heater(void);
 void pid_autotune_chamber(void);
-void start_claim(void);
 #ifdef __cplusplus
 }
 #endif
@@ -1179,89 +1178,83 @@ const MenuItem g_menu[MENU__COUNT] = {
   },
   [187] = {
     MENU_PIORTAL, { "ПОРТАЛ", "PORTAL" }, { nullptr, nullptr },
-    MN_SUBMENU, 186, 188, 2,
+    MN_SUBMENU, 186, 188, 1,
     { { NULL }, { VT_F32, NULL, 0, 0, 0, NULL, false } },
     -1, 0
   },
   [188] = {
-    MENU_START_CLAIM, { "СВЯЗАТЬ", "CLAIM" }, { nullptr, nullptr },
-    MN_ACTION, 187, -1, 0,
-    { { start_claim }, { VT_F32, NULL, 0, 0, 0, NULL, false } },
-    -1, 0
-  },
-  [189] = {
     MENU_IGNORE_EXTERNAL_CMD, { "ИГНОР КОМАНД", "IGNOR EXT CMD" }, { nullptr, nullptr },
     MN_TOGGLE, 187, -1, 0,
     { { NULL }, { VT_BOOL, (void*)&menu.ign_ext_cmd, 0, 0, 1, nullptr, false } },
     2745, 1
   },
-  [190] = {
+  [189] = {
     MENU_SESSION_COUNT, { "СЧЕТЧИК СЕССИЙ", "SESSION COUNTER" }, { nullptr, nullptr },
-    MN_SUBMENU, 186, 191, 3,
+    MN_SUBMENU, 186, 190, 3,
     { { NULL }, { VT_F32, NULL, 0, 0, 0, NULL, false } },
     -1, 0
   },
-  [191] = {
+  [190] = {
     MENU_DRYING_SESSION_COUNT, { "СУШКА", "DRYING" }, { nullptr, nullptr },
-    MN_VALUE, 190, -1, 0,
+    MN_VALUE, 189, -1, 0,
     { { NULL }, { VT_U16, (void*)&menu.drying_session_count, 0, 65535, 1, nullptr, false } },
     2746, 2
   },
-  [192] = {
+  [191] = {
     MENU_STORAGE_SESSION_COUNT, { "ХРАНЕНИЕ", "STORAGE" }, { nullptr, nullptr },
-    MN_VALUE, 190, -1, 0,
+    MN_VALUE, 189, -1, 0,
     { { NULL }, { VT_U16, (void*)&menu.storage_session_count, 0, 65535, 1, nullptr, false } },
     2748, 2
   },
-  [193] = {
+  [192] = {
     MENU_PROFILE_SESSION_COUNT, { "ПРОФИЛЬ", "PROFILE" }, { nullptr, nullptr },
-    MN_VALUE, 190, -1, 0,
+    MN_VALUE, 189, -1, 0,
     { { NULL }, { VT_U16, (void*)&menu.profile_session_count, 0, 65535, 1, nullptr, false } },
     2750, 2
   },
-  [194] = {
+  [193] = {
     MENU_HARDWARE_CONFIG, { "КОНФИГУРАЦИЯ ПОРТОВ", "PORT CONFIG" }, { nullptr, nullptr },
-    MN_SUBMENU, 186, 195, 3,
+    MN_SUBMENU, 186, 194, 3,
     { { NULL }, { VT_F32, NULL, 0, 0, 0, NULL, false } },
     -1, 0
   },
-  [195] = {
+  [194] = {
     MENU_PORT1_MODE, { "ПОРТ 1", "PORT 1" }, { nullptr, nullptr },
-    MN_VALUE, 194, -1, 0,
+    MN_VALUE, 193, -1, 0,
     { { NULL }, { VT_U8, (void*)&menu.port1_mode, 0, 3, 1, nullptr, false } },
     2752, 1
   },
-  [196] = {
+  [195] = {
     MENU_PORT2_MODE, { "ПОРТ 2", "PORT 2" }, { nullptr, nullptr },
-    MN_VALUE, 194, -1, 0,
+    MN_VALUE, 193, -1, 0,
     { { NULL }, { VT_U8, (void*)&menu.port2_mode, 0, 3, 1, nullptr, false } },
     2753, 1
   },
-  [197] = {
+  [196] = {
     MENU_PORT3_MODE, { "ПОРТ 3", "PORT 3" }, { nullptr, nullptr },
-    MN_VALUE, 194, -1, 0,
+    MN_VALUE, 193, -1, 0,
     { { NULL }, { VT_U8, (void*)&menu.port3_mode, 0, 3, 1, nullptr, false } },
     2754, 1
   },
-  [198] = {
+  [197] = {
     MENU_WS_LOCAL, { "WS ЛОКАЛЬНЫЙ", "WS LOCAL" }, { nullptr, nullptr },
-    MN_SUBMENU, 186, 199, 1,
+    MN_SUBMENU, 186, 198, 1,
     { { NULL }, { VT_F32, NULL, 0, 0, 0, NULL, false } },
     -1, 0
   },
-  [199] = {
+  [198] = {
     MENU_WS_ENABLED, { "ВКЛ/ВЫКЛ", "ON/OFF" }, { nullptr, nullptr },
-    MN_TOGGLE, 198, -1, 0,
+    MN_TOGGLE, 197, -1, 0,
     { { NULL }, { VT_BOOL, (void*)&menu.ws_enabled, 0, 0, 1, ws_toggle, false } },
     2755, 1
   },
-  [200] = {
+  [199] = {
     MENU_UNITS_COUNT, { "КОЛ-ВО ЮНИТОВ", "UNITS" }, { nullptr, nullptr },
     MN_VALUE, 186, -1, 0,
     { { NULL }, { VT_U8, (void*)&menu.units_count, 1, 3, 1, units_count_set, false } },
     2756, 1
   },
-  [201] = {
+  [200] = {
     MENU_LANGUAGE, { "ЯЗЫК", "LANGUAGE" }, { nullptr, nullptr },
     MN_VALUE, 186, -1, 0,
     { { NULL }, { VT_U8, (void*)&menu.language, 0, 1, 1, on_language_changed, true } },

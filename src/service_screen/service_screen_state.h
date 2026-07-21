@@ -8,9 +8,11 @@
 constexpr uint32_t IDLE_TO_STATUS_MS = 15000;   //! через 15с в idle показываем статус
 constexpr uint32_t MODE_SWAP_MS      = 5000;   // каждые 4с переключаемся "режим <-> весы"
 constexpr uint32_t UNIT_ROTATE_MS    = 10000;  // каждые 6с перелистываем юнит
+constexpr uint32_t SCREEN_OFF_MS     = 180000; // гасим экран после 3 мин без ввода
 
 extern uint8_t      gscr_active_unit;
 extern uint32_t     gscr_next_unit_rotate_ms;
+extern uint32_t     g_lastInputMs;             // последний ввод (энкодер/кнопки), любой юнит
 
 struct ScreenState {
   enum class Kind : uint8_t {Error, Menu, IdleStatus, Drying, Storage, AutoTune, Weight };

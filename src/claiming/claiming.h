@@ -27,3 +27,7 @@ void claim_on_complete(const idryer::UartClaimCompletePayload &payload, uint32_t
 bool claim_is_visible();
 ClaimUiSnapshot claim_get_snapshot(uint32_t nowMs);
 void claim_hide();
+
+// Автоскрытие overlay после успешной привязки (Claimed) по таймауту.
+// Вызывать каждый кадр из рендера — иначе claim-экран висит вечно.
+void claim_tick(uint32_t nowMs);

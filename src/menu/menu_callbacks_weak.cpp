@@ -44,8 +44,6 @@ void pid_autotune_chamber(void) __attribute__((weak));
 void pid_autotune_chamber(void) { /* stub */ }
 void pid_autotune_heater(void) __attribute__((weak));
 void pid_autotune_heater(void) { /* stub */ }
-void start_claim(void) __attribute__((weak));
-void start_claim(void) { /* stub */ }
 void start_drying(void) __attribute__((weak));
 void start_drying(void) { /* stub */ }
 void start_drying_abs(void) __attribute__((weak));

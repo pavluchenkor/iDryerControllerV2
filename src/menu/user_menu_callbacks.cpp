@@ -52,9 +52,8 @@ extern "C" {
 #include "menu_presets_autogen.h"
 
 
+#if 0 // CLAIM ВРЕМЕННО ОТКЛЮЧЁН
 void start_claim(void) {
-  // DISABLED: claiming not used
-  /*
   const uint32_t now = millis();
   claim_begin(now);
 
@@ -72,8 +71,8 @@ void start_claim(void) {
     err.status = idryer::UartClaimStatus::Error;
     claim_on_status(err, now);
   }
-  */
 }
+#endif // CLAIM ВРЕМЕННО ОТКЛЮЧЁН
 
 void start_profile(void) {
   uint8_t i = menu_get_active_controller();

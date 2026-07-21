@@ -7,6 +7,7 @@
 #include "debug_log.h"
 // КРИТИЧНО: Устанавливаем уровень логов для этого файла
 
+#include "claiming/claiming.h"
 #include "controller/control.h"
 #include "error/error_bus.h"
 #include "error/error_table.h"
@@ -683,7 +684,7 @@ void handleUartClaimStatus(const idryer::UartClaimStatusPayload &payload, const 
   } else {
     g_claimed_blinked = false;
   }
-  // claim_on_status(payload, millis()); // DISABLED: claiming not used
+  claim_on_status(payload, millis());
 }
 
 void handleUartClaimComplete(const idryer::UartClaimCompletePayload &payload, const idryer::UartFrameHeader &header) {
@@ -692,7 +693,7 @@ void handleUartClaimComplete(const idryer::UartClaimCompletePayload &payload, co
     ledsShowWebBreath(LedColors::BLUE, 1000, 5000); // 5 дыханий
     g_claimed_blinked = true;
   }
-  // claim_on_complete(payload, millis()); // DISABLED: claiming not used
+  claim_on_complete(payload, millis());
 }
 
 void handleUartError(const idryer::UartErrorPayload &payload, bool remote) {
